@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Derangement Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(45deg, #007bff, #ff5af7, #ffae00, #00b351);
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            text-align: center;
+            width: 300px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #007bff;
+            margin: 10px 0px 10px 0px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            width: 80%;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            margin: 10px 0px 10px 0px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        p#result {
+            font-weight: bold;
+            margin-top: 5px;
+            color: #333;
+        }
+
+        p#error {
+            color: red;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Derangement Calculator</h1>
+        <form id="derangementForm">
+            <label for="n">Enter a positive integer (n): </label>
+            <input type="number" id="n" name="n" min="1" required>
+            <!-- <button type="button" onclick="calculateDerangement()">Calculate</button> -->
+        </form>
+        <p id="result"></p>
+        <p id="error"></p>
+    </div>
+
+    <script>
+        function factorial(n) {
+            let fact = 1;
+            for (let i = 1; i <= n; i++) {
+                fact *= i;
+            }
+            return fact;
+        }
+
+        function combination(n, i) {
+            // This function calculates the number of combinations of n items taken i at a time
+            if (i === 0) {
+                return 1;
+            }
+            return factorial(n) / (factorial(i) * factorial(n - i));
+        }
+
+        function dpDerangement(n, M) {
+            if (M[n - 1] !== undefined) {
+                return M[n - 1];
+            }
+            if (n === 0) {
+                M[n - 1] = 1;
+                return M[n - 1];
+            }
+            let sum = 0;
+            for (let i = 0; i < n; i++) {
+                sum += combination(n, n - i) * dpDerangement(i, M);
+            }
+            M[n - 1] = factorial(n) - sum;
+            return M[n - 1];
+        }
+
+        function calculateDerangement() {
+            const nInput = document.getElementById("n");
+            const resultDisplay = document.getElementById("result");
+            const errorDisplay = document.getElementById("error");
+
+            const n = parseInt(nInput.value);
+
+            if (!isNaN(n)) {
+                if (n >= 0) {
+                    const M = new Array(n).fill(undefined);
+                    const result = dpDerangement(n, M);
+                    resultDisplay.textContent = `Derangement of ${n} is ${result}`;
+                    errorDisplay.textContent = "";
+                } else {
+                    resultDisplay.textContent = "";
+                    errorDisplay.textContent = "Please enter a positive integer.";
+                }
+            } else {
+                resultDisplay.textContent = "";
+                errorDisplay.textContent = "";
+            }
+        }
+
+        // Add event listener to input for real-time calculation
+        const nInput = document.getElementById("n");
+        nInput.addEventListener("input", calculateDerangement);
+
+    </script>
+</body>
+</html>
